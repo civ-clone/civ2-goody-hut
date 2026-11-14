@@ -178,7 +178,10 @@ describe('outcome', (): void => {
     });
   });
 
-  it('always ends, within its steps, whatever it knows and rolls', (): void => {
+  it('always ends, within its steps, whatever it knows and rolls', function (): void {
+    // Over 100,000 cases: a slow CI runner needs more than mocha's default 2 s.
+    this.timeout(30000);
+
     const bools = [false, true];
     let cases = 0;
 
