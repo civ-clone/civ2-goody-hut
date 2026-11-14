@@ -28,4 +28,4 @@ civ2-treasury gives each player. Without a per-player Gold treasury, opening a h
 - **Others on the land mass** are any other civilization's cities and units there, for people and computer players
   alike; the game keeps that record for the computer players.
 - The game's random numbers are drawn in its order, from this game's generator, except a tribe's city after 1000 AD:
-  the game draws four more there (`hut_tribe_city`: the size and each improvement), which are skipped with them.
+  the game draws four more there (`hut_tribe_city`: the size and each improvement), which aren't drawn here, since the city gets neither.
