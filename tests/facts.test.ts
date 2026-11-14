@@ -162,4 +162,44 @@ describe('hutFacts', function (): void {
     // Within the 21.
     expect(factsAt(11, 10).fertility).equal(0);
   });
+
+  it("finds a city's 45 squares across the east-west wrap", async (): Promise<void> => {
+    const { computer, dependencies, place } = await setUp(),
+      game = new Game(),
+      world = await new World(
+        new Loader(
+          20,
+          20,
+          Array.from({ length: 400 }, () => [new Grassland(game.rules)]) as [
+            Terrain
+          ][],
+          game.terrainFeatures
+        ),
+        game.rules,
+        game.landMasses
+      ).build(),
+      // On the west edge.
+      cityTile = world.get(0, 10),
+      city = {
+        destroyed: () => false,
+        player: () => null,
+        tile: () => cityTile,
+      },
+      onWorld = {
+        ...dependencies,
+        cityRegistry: { entries: () => [city] } as any,
+        landMassRegistry: game.landMasses,
+        terrainFeatureRegistry: game.terrainFeatures,
+      },
+      unit = place(Warrior, computer, 1),
+      factsAt = (x: number, y: number) =>
+        hutFacts(onWorld, world.get(x, y), unit);
+
+    // The last square of the row, one square west across the wrap: (-2, 0), one of the 45.
+    expect(factsAt(19, 10).fertility).equal(0);
+    // The next row down, half a square west across the wrap: (-1, 1).
+    expect(factsAt(19, 11).fertility).equal(0);
+    // Four squares west across the wrap, (-8, 0), is beyond the 45.
+    expect(factsAt(16, 10).fertility).equal(15);
+  });
 });
