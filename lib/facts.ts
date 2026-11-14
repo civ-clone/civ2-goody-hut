@@ -29,6 +29,7 @@ import Unit from '@civ-clone/core-unit/Unit';
 import { civ2Distance } from '@civ-clone/civ2-player/lib/startBalance';
 import { fertility } from '@civ-clone/civ2-world/lib/fertility';
 import { hutAdvance } from './rewards';
+import { inCityArea } from './cityArea';
 import isBarbarian from '@civ-clone/base-civilization-barbarian/isBarbarian';
 import { isHuman } from '@civ-clone/civ2-difficulty/isHuman';
 import { levelOf } from '@civ-clone/civ2-difficulty/level';
@@ -185,9 +186,12 @@ export const hutFacts = (
     turn: dependencies.turn.value(),
     homelessSettlers: homelessSettlers(dependencies),
     ownHomelessSettlers: homelessSettlers(dependencies, player),
-    // Within a city's radius the game reads the city's owner, and it lowers fertility around a city: both below 12.
-    //  The chain asks only with no city nearer than 4, beyond both, so the map's fertility is enough.
-    fertility: fertility(tile, dependencies.terrainFeatureRegistry),
+    // Within a city's 21 squares the game reads the city's owner, and over its 45 squares it lowers fertility below 8
+    //  (`city_refresh_area_tiles`): either way no tribe's city. The 45 reach civ2 distance 4, so a hut 4 from a city can
+    //  be inside them.
+    fertility: cities.some((city: City): boolean => inCityArea(tile, city))
+      ? 0
+      : fertility(tile, dependencies.terrainFeatureRegistry),
     knowsInvention: dependencies.playerResearchRegistry
       .getByPlayer(player)
       .completed(Invention),

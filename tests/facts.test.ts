@@ -121,4 +121,45 @@ describe('hutFacts', function (): void {
 
     expect(facts.othersOnLandMass).true;
   });
+
+  it("reads no fertility within a city's 45 squares, 4 away included, and the map's beyond them", async (): Promise<void> => {
+    const { computer, dependencies, place } = await setUp(),
+      game = new Game(),
+      world = await new World(
+        new Loader(
+          20,
+          20,
+          Array.from({ length: 400 }, () => [new Grassland(game.rules)]) as [
+            Terrain
+          ][],
+          game.terrainFeatures
+        ),
+        game.rules,
+        game.landMasses
+      ).build(),
+      cityTile = world.get(10, 10),
+      city = {
+        destroyed: () => false,
+        player: () => null,
+        tile: () => cityTile,
+      },
+      onWorld = {
+        ...dependencies,
+        cityRegistry: { entries: () => [city] } as any,
+        landMassRegistry: game.landMasses,
+        terrainFeatureRegistry: game.terrainFeatures,
+      },
+      unit = place(Warrior, computer, 1),
+      factsAt = (x: number, y: number) =>
+        hutFacts(onWorld, world.get(x, y), unit);
+
+    // Five rows down, half a square across: (1, 5) in Civ2's coordinates, 4 away and one of the 45.
+    expect(factsAt(10, 15).nearestCity).equal(4);
+    expect(factsAt(10, 15).fertility).equal(0);
+    // Three squares along the row: (6, 0), also 4 away, but beyond the 45.
+    expect(factsAt(13, 10).nearestCity).equal(4);
+    expect(factsAt(13, 10).fertility).equal(15);
+    // Within the 21.
+    expect(factsAt(11, 10).fertility).equal(0);
+  });
 });

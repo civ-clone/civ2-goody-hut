@@ -24,7 +24,7 @@ export interface HutFacts {
   homelessSettlers: number;
   /** Units of the settlers role with no home city, the player's. */
   ownHomelessSettlers: number;
-  /** The hut square's fertility, 0 if it's in a city's radius (`tile_owner_or_fertility`). */
+  /** The hut square's fertility, 0 within the 45 squares around any city (`tile_owner_or_fertility`). */
   fertility: number;
   /** The player knows Invention. */
   knowsInvention: boolean;
